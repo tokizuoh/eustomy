@@ -2,8 +2,11 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
+	"os"
 
+	"github.com/joho/godotenv"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -15,6 +18,8 @@ type word struct {
 	pos    int
 }
 
+// [TODO]: 関数の機能が複数（クエリ実行、構造体へのパース）なので分けたほうが良さそう
+// getJapaneseWords executes a query that returns Japanese only rows.
 func getJapaneseWords(db *sql.DB) ([]word, error) {
 	rows, err := db.Query("select * from word where lang='jpn'")
 	if err != nil {
@@ -29,6 +34,20 @@ func getJapaneseWords(db *sql.DB) ([]word, error) {
 		words = append(words, w)
 	}
 	return words, nil
+}
+
+// getRomanLetters convert Kanji , Hiragana and Katakana to RomanLetters.
+func getRomanLetters(str string) (string, error) {
+	if err := godotenv.Load(); err != nil {
+		return "", err
+	}
+
+	baseURL := "https://jlp.yahooapis.jp/FuriganaService/V1/furigana"
+	appID := os.Getenv("APP_ID")
+
+	requestURL := fmt.Sprintf("%s?%s", baseURL, appID)
+	log.Println(requestURL)
+	return "", nil
 }
 
 func main() {
