@@ -18,3 +18,4 @@
 
 # Custom
 *.db
+.env
