@@ -2,8 +2,8 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
+	"net/http"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -17,6 +17,8 @@ type word struct {
 	pron   string
 	pos    int
 }
+
+const TARGET = "今日は良い天気ですね、ボブ。"
 
 // [TODO]: 関数の機能が複数（クエリ実行、構造体へのパース）なので分けたほうが良さそう
 // getJapaneseWords executes a query that returns Japanese only rows.
@@ -43,10 +45,18 @@ func getRomanLetters(str string) (string, error) {
 	}
 
 	baseURL := "https://jlp.yahooapis.jp/FuriganaService/V1/furigana"
-	appID := os.Getenv("APP_ID")
+	request, err := http.NewRequest("GET", baseURL, nil)
+	if err != nil {
+		return "", nil
+	}
 
-	requestURL := fmt.Sprintf("%s?%s", baseURL, appID)
-	log.Println(requestURL)
+	parames := request.URL.Query()
+
+	appID := os.Getenv("APP_ID")
+	parames.Add("appid", appID)
+	parames.Add("grade", "1")
+	parames.Add("sentence", TARGET)
+	request.URL.RawQuery = parames.Encode()
 	return "", nil
 }
 
