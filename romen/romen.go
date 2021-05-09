@@ -1,6 +1,7 @@
 package romen
 
 import (
+	"encoding/xml"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -11,6 +12,32 @@ import (
 
 // TODO: 動的にする
 const TARGET = "天気"
+
+type Word struct {
+	Surface  string
+	Furigana string
+	Roman    string
+}
+
+type WordList struct {
+	Word Word
+}
+
+type Result struct {
+	WordList WordList
+}
+
+type ResultSet struct {
+	Result Result
+}
+
+func convertStructfromXML(b []byte) (ResultSet, error) {
+	rs := ResultSet{}
+	if err := xml.Unmarshal(b, &rs); err != nil {
+		return ResultSet{}, err
+	}
+	return rs, nil
+}
 
 // getRomanLetters convert Kanji , Hiragana and Katakana to RomanLetters.
 func GetRomanLetters(str string) (string, error) {
@@ -45,8 +72,12 @@ func GetRomanLetters(str string) (string, error) {
 		return "", err
 	}
 
-	// TODO: XML -> structに変換する
-	log.Println(string(body))
+	rs, err := convertStructfromXML(body)
+	if err != nil {
+		return "", err
+	}
+
+	log.Println(rs)
 
 	return "", nil
 }
