@@ -1,4 +1,4 @@
-package romen
+package roman
 
 import (
 	"encoding/xml"
