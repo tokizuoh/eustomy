@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"log"
 
-	"roman"
+	"cdb"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -36,7 +36,7 @@ func getJapaneseWords(db *sql.DB) ([]word, error) {
 }
 
 func main() {
-	roman.GetRomanLetters("a")
+	cdb.A()
 	return
 	var db *sql.DB
 	db, err := sql.Open("sqlite3", "./wnjpn.db")
