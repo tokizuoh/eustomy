@@ -2,7 +2,6 @@ package cdb
 
 import (
 	"database/sql"
-	"log"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -13,6 +12,11 @@ type word struct {
 	lemma  string
 	pron   string
 	pos    int
+}
+
+type romanWord struct {
+	raw   string
+	roman string
 }
 
 // [TODO]: 関数の機能が複数（クエリ実行、構造体へのパース）なので分けたほうが良さそう
@@ -47,8 +51,13 @@ func GenerateCustomDB() error {
 		return err
 	}
 
+	var romanWords []romanWord
 	for _, word := range words {
-		log.Println(word)
+		rw := romanWord{
+			raw:   word.lemma,
+			roman: "TODO", // TODO: rawに対してローマ字変換した文字列を指定する
+		}
+		romanWords = append(romanWords, rw)
 	}
 
 	return nil
