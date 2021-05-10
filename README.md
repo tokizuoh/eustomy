@@ -26,5 +26,7 @@ docker-compose version 1.27.2, build 18f557f9
 ```
 ## Flowchart
   
-![](./docs/flowchart_using.png)
+|  using                            |  update DB                     |
+| --------------------------------- | ------------------------------ |
+|  ![](./docs/flowchart_using.png)  |  ![](./docs/flowchart_db.png)  |
   
