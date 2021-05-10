@@ -3,15 +3,11 @@ package roman
 import (
 	"encoding/xml"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 
 	"github.com/joho/godotenv"
 )
-
-// TODO: 動的にする
-const TARGET = "天気"
 
 type Word struct {
 	Surface  string
@@ -56,7 +52,7 @@ func GetRomanLetters(str string) (string, error) {
 	appID := os.Getenv("APP_ID")
 	parames.Add("appid", appID)
 	parames.Add("grade", "1")
-	parames.Add("sentence", TARGET)
+	parames.Add("sentence", str)
 	request.URL.RawQuery = parames.Encode()
 
 	client := &http.Client{}
@@ -77,7 +73,5 @@ func GetRomanLetters(str string) (string, error) {
 		return "", err
 	}
 
-	log.Println(rs)
-
-	return "", nil
+	return rs.Result.WordList.Word.Roman, nil
 }

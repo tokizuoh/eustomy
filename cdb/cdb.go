@@ -2,8 +2,11 @@ package cdb
 
 import (
 	"database/sql"
+	"log"
 
 	_ "github.com/mattn/go-sqlite3"
+
+	"roman"
 )
 
 type word struct {
@@ -53,11 +56,16 @@ func GenerateCustomDB() error {
 
 	var romanWords []romanWord
 	for _, word := range words {
+		r, err := roman.GetRomanLetters(word.lemma)
+		if err != nil {
+			return err
+		}
 		rw := romanWord{
 			raw:   word.lemma,
-			roman: "TODO", // TODO: rawに対してローマ字変換した文字列を指定する
+			roman: r, // TODO: rawに対してローマ字変換した文字列を指定する
 		}
 		romanWords = append(romanWords, rw)
+		log.Println(rw.raw, " | ", rw.roman)
 	}
 
 	return nil
