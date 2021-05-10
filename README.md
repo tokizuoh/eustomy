@@ -24,3 +24,7 @@ docker-compose version 1.27.2, build 18f557f9
 ```bash
 > docker-compose exec app go mod download && go run main.go
 ```
+## Flowchart
+  
+![](./docs/flowchart.png)
+  
