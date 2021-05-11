@@ -22,7 +22,7 @@ docker-compose version 1.27.2, build 18f557f9
 ### Run
   
 ```bash
-> docker-compose exec app go mod download && go run main.go
+> docker-compose exec app go run main.go
 ```
 ## Flowchart
   
