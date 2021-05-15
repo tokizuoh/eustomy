@@ -2,7 +2,9 @@ package cdb
 
 import (
 	"database/sql"
+	"encoding/csv"
 	"log"
+	"os"
 
 	_ "github.com/mattn/go-sqlite3"
 
@@ -20,6 +22,7 @@ type word struct {
 type romanWord struct {
 	raw   string
 	roman string
+	// vowels string
 }
 
 // [TODO]: 関数の機能が複数（クエリ実行、構造体へのパース）なので分けたほうが良さそう
@@ -40,6 +43,32 @@ func getJapaneseWords(db *sql.DB) ([]word, error) {
 	return words, nil
 }
 
+// debugGenerateCSV convert struct to csv.
+func debugGenerateCSV(words []word) error {
+	file, err := os.OpenFile("./debug_roman.csv", os.O_WRONLY|os.O_CREATE, 0600)
+	if err != nil {
+		return err
+	}
+	writer := csv.NewWriter(file)
+	line := []string{"raw", "roman"}
+	writer.Write(line)
+
+	for _, word := range words {
+		r, err := roman.GetRomanLetters(word.lemma)
+		if err != nil {
+			return err
+		}
+		rw := romanWord{
+			raw:   word.lemma,
+			roman: r,
+			// vowels: "TODO: convert roman to vowel",
+		}
+		line := []string{rw.raw, rw.roman}
+		writer.Write(line)
+	}
+	return nil
+}
+
 func GenerateCustomDB() error {
 	var db *sql.DB
 	db, err := sql.Open("sqlite3", "./wnjpn.db")
@@ -54,18 +83,8 @@ func GenerateCustomDB() error {
 		return err
 	}
 
-	var romanWords []romanWord
-	for _, word := range words {
-		r, err := roman.GetRomanLetters(word.lemma)
-		if err != nil {
-			return err
-		}
-		rw := romanWord{
-			raw:   word.lemma,
-			roman: r, // TODO: rawに対してローマ字変換した文字列を指定する
-		}
-		romanWords = append(romanWords, rw)
-		log.Println(rw.raw, " | ", rw.roman)
+	if err := debugGenerateCSV(words); err != nil {
+		log.Fatal(err)
 	}
 
 	return nil
