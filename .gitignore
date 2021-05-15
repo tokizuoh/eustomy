@@ -19,3 +19,4 @@
 # Custom
 *.db
 .env
+*.csv
