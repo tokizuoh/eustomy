@@ -5,6 +5,7 @@ import (
 	"encoding/csv"
 	"log"
 	"os"
+	"strings"
 
 	_ "github.com/mattn/go-sqlite3"
 
@@ -20,9 +21,9 @@ type word struct {
 }
 
 type romanWord struct {
-	raw   string
-	roman string
-	// vowels string
+	raw    string
+	roman  string
+	vowels string
 }
 
 // [TODO]: 関数の機能が複数（クエリ実行、構造体へのパース）なので分けたほうが良さそう
@@ -43,14 +44,25 @@ func getJapaneseWords(db *sql.DB) ([]word, error) {
 	return words, nil
 }
 
+func extractCustomVowels(target, vowels string) string {
+	res := ""
+	for _, tr := range target {
+		t := string([]rune{tr})
+		if strings.Contains(vowels, t) {
+			res += t
+		}
+	}
+	return res
+}
+
 // debugGenerateCSV convert struct to csv.
 func debugGenerateCSV(words []word) error {
-	file, err := os.OpenFile("./debug_roman.csv", os.O_WRONLY|os.O_CREATE, 0600)
+	file, err := os.OpenFile("./debug_roman_vowels.csv", os.O_WRONLY|os.O_CREATE, 0600)
 	if err != nil {
 		return err
 	}
 	writer := csv.NewWriter(file)
-	line := []string{"raw", "roman"}
+	line := []string{"raw", "roman", "vowels"}
 	writer.Write(line)
 
 	for _, word := range words {
@@ -59,11 +71,11 @@ func debugGenerateCSV(words []word) error {
 			return err
 		}
 		rw := romanWord{
-			raw:   word.lemma,
-			roman: r,
-			// vowels: "TODO: convert roman to vowel",
+			raw:    word.lemma,
+			roman:  r,
+			vowels: extractCustomVowels(r, "aiueon"),
 		}
-		line := []string{rw.raw, rw.roman}
+		line := []string{rw.raw, rw.roman, rw.vowels}
 		writer.Write(line)
 	}
 	return nil
