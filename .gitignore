@@ -20,3 +20,4 @@
 *.db
 .env
 *.csv
+.DS_Store
