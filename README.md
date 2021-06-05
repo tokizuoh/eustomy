@@ -1,5 +1,6 @@
 # eustomy
-Return words with the same vowel.
+  
+![](./docs/eustomy.png)
   
 ## Docker
   
