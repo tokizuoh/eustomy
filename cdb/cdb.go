@@ -3,6 +3,7 @@ package cdb
 import (
 	"database/sql"
 	"encoding/csv"
+	"io"
 	"log"
 	"os"
 	"strings"
@@ -20,10 +21,10 @@ type word struct {
 	pos    int
 }
 
-type romanWord struct {
-	raw    string
-	roman  string
-	vowels string
+type RomanWord struct {
+	Raw    string `json:"row"`
+	Roman  string `json:"roman"`
+	Vowels string `json:"vowels"`
 }
 
 // [TODO]: 関数の機能が複数（クエリ実行、構造体へのパース）なので分けたほうが良さそう
@@ -70,12 +71,12 @@ func debugGenerateCSV(words []word) error {
 		if err != nil {
 			return err
 		}
-		rw := romanWord{
-			raw:    word.lemma,
-			roman:  r,
-			vowels: extractCustomVowels(r, "aiueon"),
+		rw := RomanWord{
+			Raw:    word.lemma,
+			Roman:  r,
+			Vowels: extractCustomVowels(r, "aiueon"),
 		}
-		line := []string{rw.raw, rw.roman, rw.vowels}
+		line := []string{rw.Raw, rw.Roman, rw.Vowels}
 		writer.Write(line)
 	}
 	return nil
@@ -100,4 +101,44 @@ func GenerateCustomDB() error {
 	}
 
 	return nil
+}
+
+func GetSameVowelsWords(csvPath, target string) ([]RomanWord, error) {
+	file, err := os.Open(csvPath)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	targetVowel := extractCustomVowels(target, "aiueon")
+
+	reader := csv.NewReader(file)
+	_, err = reader.Read()
+	if err != nil {
+		return nil, err
+	}
+
+	res := []RomanWord{}
+	for {
+		line, err := reader.Read()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return nil, err
+		}
+
+		vowel := line[2]
+		if targetVowel == vowel {
+			rw := RomanWord{
+				Raw:    line[0],
+				Roman:  line[1],
+				Vowels: line[2],
+			}
+			res = append(res, rw)
+		}
+
+	}
+
+	return res, nil
 }
