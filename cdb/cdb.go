@@ -24,7 +24,7 @@ type word struct {
 }
 
 type RomanWord struct {
-	Raw    string `json:"row"`
+	Raw    string `json:"raw"`
 	Roman  string `json:"roman"`
 	Vowels string `json:"vowels"`
 }
