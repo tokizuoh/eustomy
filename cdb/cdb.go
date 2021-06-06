@@ -3,10 +3,12 @@ package cdb
 import (
 	"database/sql"
 	"encoding/csv"
+	"fmt"
 	"io"
 	"log"
 	"os"
 	"strings"
+	"time"
 
 	_ "github.com/mattn/go-sqlite3"
 
@@ -47,10 +49,25 @@ func getJapaneseWords(db *sql.DB) ([]word, error) {
 
 func extractCustomVowels(target, vowels string) string {
 	res := ""
-	for _, tr := range target {
+	skip := false
+	for i, tr := range target {
+		if skip {
+			skip = false
+			continue
+		}
 		t := string([]rune{tr})
-		if strings.Contains(vowels, t) {
+		if strings.Contains("aiueo", t) {
 			res += t
+		} else if t == "n" {
+			if i+1 < len(target) {
+				nt := string(target[i+1])
+				if strings.Contains("aiueo", nt) {
+					skip = true
+					res += nt
+				}
+			} else {
+				res += t
+			}
 		}
 	}
 	return res
@@ -58,7 +75,12 @@ func extractCustomVowels(target, vowels string) string {
 
 // debugGenerateCSV convert struct to csv.
 func debugGenerateCSV(words []word) error {
-	file, err := os.OpenFile("./debug_roman_vowels.csv", os.O_WRONLY|os.O_CREATE, 0600)
+	layout := "20060102_1504"
+	now := time.Now()
+	ts := now.Format(layout)
+	opFilePath := fmt.Sprintf("./debug_roman_vowels_%s.csv", ts)
+
+	file, err := os.OpenFile(opFilePath, os.O_WRONLY|os.O_CREATE, 0600)
 	if err != nil {
 		return err
 	}
