@@ -3,12 +3,13 @@ package main
 import (
 	"cdb"
 	"encoding/json"
+	"flag"
 	"log"
 	"net/http"
 )
 
 func getSameVowelsWords(s string) ([]cdb.RomanWord, error) {
-	rws, err := cdb.GetSameVowelsWords("debug_roman_vowels.csv", s)
+	rws, err := cdb.GetSameVowelsWords("./debug_roman_vowels_20210606_1322.csv", s)
 	if err != nil {
 		return nil, err
 	}
@@ -17,6 +18,15 @@ func getSameVowelsWords(s string) ([]cdb.RomanWord, error) {
 }
 
 func main() {
+	d := flag.Bool("d", false, "debug flag")
+	flag.Parse()
+	if *d {
+		if err := cdb.GenerateCustomDB(); err != nil {
+			log.Fatal(err)
+		}
+		return
+	}
+
 	h := func(w http.ResponseWriter, r *http.Request) {
 		log.Println(1)
 		t := r.URL.Query().Get("target")
