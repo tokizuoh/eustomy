@@ -2,6 +2,14 @@
   
 ![](./docs/eustomy.png)
   
+## .env
+  
+```bash
+APP_ID = {YAHOO_APP_ID}
+CLIENT_ID = xxxxxxx
+CLIENT_SECRET = xxxxxxx
+```
+  
 ## Docker
   
 ### Version
