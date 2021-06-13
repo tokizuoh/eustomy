@@ -47,7 +47,7 @@ func getJapaneseWords(db *sql.DB) ([]word, error) {
 	return words, nil
 }
 
-func extractCustomVowels(target, vowels string) string {
+func ExtractCustomVowels(target, vowels string) string {
 	res := ""
 	skip := false
 	for i, tr := range target {
@@ -64,6 +64,8 @@ func extractCustomVowels(target, vowels string) string {
 				if strings.Contains("aiueo", nt) {
 					skip = true
 					res += nt
+				} else {
+					res += t
 				}
 			} else {
 				res += t
@@ -96,7 +98,7 @@ func debugGenerateCSV(words []word) error {
 		rw := RomanWord{
 			Raw:    word.lemma,
 			Roman:  r,
-			Vowels: extractCustomVowels(r, "aiueon"),
+			Vowels: ExtractCustomVowels(r, "aiueon"),
 		}
 		line := []string{rw.Raw, rw.Roman, rw.Vowels}
 		writer.Write(line)
@@ -132,7 +134,7 @@ func GetSameVowelsWords(csvPath, target string) ([]RomanWord, error) {
 	}
 	defer file.Close()
 
-	targetVowel := extractCustomVowels(target, "aiueon")
+	targetVowel := ExtractCustomVowels(target, "aiueon")
 
 	reader := csv.NewReader(file)
 	_, err = reader.Read()

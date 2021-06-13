@@ -9,7 +9,7 @@ import (
 )
 
 func getSameVowelsWords(s string) ([]cdb.RomanWord, error) {
-	rws, err := cdb.GetSameVowelsWords("./debug_roman_vowels_20210606_1322.csv", s)
+	rws, err := cdb.GetSameVowelsWords("./debug_roman_vowels_20210613_0102.csv", s)
 	if err != nil {
 		return nil, err
 	}
